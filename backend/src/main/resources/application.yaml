@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: ourspace
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ourspace
+    username: espacio
+    password: espacio123
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  flyway:
+    enabled: false
+  
+server:
+  servlet:
+    context-path: /api/v1
