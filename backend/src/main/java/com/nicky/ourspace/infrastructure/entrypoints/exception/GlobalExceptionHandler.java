@@ -1,11 +1,13 @@
 package com.nicky.ourspace.infrastructure.entrypoints.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.nicky.ourspace.domain.exception.OwnerMembershipCannotBeRemovedException;
+import com.nicky.ourspace.domain.exception.ImageNotFoundException;
 import com.nicky.ourspace.domain.exception.RoomMemberAccessDeniedException;
 import com.nicky.ourspace.domain.exception.RoomMemberAlreadyExistsException;
 import com.nicky.ourspace.domain.exception.RoomMemberNotFoundException;
@@ -21,7 +23,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             RoomNotFoundException.class,
             RoomMemberNotFoundException.class,
-            UserNotFoundException.class
+            UserNotFoundException.class,
+            ImageNotFoundException.class
     })
     public ResponseEntity<String> handleRoomMemberNotFoundException(RuntimeException ex) {
         return ResponseEntity.status(404).body(ex.getMessage());
@@ -43,6 +46,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})
     public ResponseEntity<String> handleBadRequestException(Exception ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<String> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(413).body("Image upload exceeds the maximum allowed size");
     }
 
     @ExceptionHandler(RefreshTokenExpiredException.class)
