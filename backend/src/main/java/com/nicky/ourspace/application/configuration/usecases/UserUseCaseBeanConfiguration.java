@@ -10,50 +10,50 @@ import com.nicky.ourspace.application.usecases.user.FindUserByIdUseCase;
 import com.nicky.ourspace.application.usecases.user.FindUserByUsernameUseCase;
 import com.nicky.ourspace.application.usecases.user.SaveUserUseCase;
 import com.nicky.ourspace.application.usecases.user.UpdateUserUseCase;
-import com.nicky.ourspace.domain.port.UserPort;
+import com.nicky.ourspace.infrastructure.drivenadapters.adapters.UserAdapter;
 
 @Configuration
 public class UserUseCaseBeanConfiguration {
 
     @Bean
     FindAllUsersUseCase findAllUsersUseCase(
-            UserPort userPort) {
+            UserAdapter userPort) {
         return new FindAllUsersUseCase(userPort);
     }
 
     @Bean
     FindUserByIdUseCase findUserByIdUseCase(
-            UserPort userPort) {
+            UserAdapter userPort) {
         return new FindUserByIdUseCase(userPort);
     }
 
     @Bean
     FindUserByEmailUseCase findUserByEmailUseCase(
-            UserPort userPort) {
+            UserAdapter userPort) {
         return new FindUserByEmailUseCase(userPort);
     }
 
     @Bean
     FindUserByUsernameUseCase findUserByUsernameUseCase(
-            UserPort userPort) {
+            UserAdapter userPort) {
         return new FindUserByUsernameUseCase(userPort);
     }
 
     @Bean
     DeleteUserUseCase deleteUserUseCase(
-            UserPort userPort) {
+            UserAdapter userPort) {
         return new DeleteUserUseCase(userPort);
     }
 
     @Bean
     SaveUserUseCase saveUserUseCase(
-            UserPort userPort) {
+            UserAdapter userPort) {
         return new SaveUserUseCase(userPort);
     }
 
     @Bean
     UpdateUserUseCase updateUserUseCase(
-            UserPort userPort) {
+            UserAdapter userPort) {
         return new UpdateUserUseCase(userPort);
     }
 
