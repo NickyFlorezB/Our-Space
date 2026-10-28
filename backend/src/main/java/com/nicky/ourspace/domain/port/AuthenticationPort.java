@@ -1,6 +1,8 @@
 package com.nicky.ourspace.domain.port;
 
+import java.util.Map;
+
 public interface AuthenticationPort {
 
-    String login(String username, String password);
+    Map<String, String> login(String username, String password);
 }
