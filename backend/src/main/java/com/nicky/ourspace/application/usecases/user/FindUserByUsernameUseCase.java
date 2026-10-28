@@ -16,7 +16,7 @@ public class FindUserByUsernameUseCase {
 
     public User execute(String username) {
         return userPort.findUserByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found")); // TODO -> Change to custom domain exception
     }
 
 }

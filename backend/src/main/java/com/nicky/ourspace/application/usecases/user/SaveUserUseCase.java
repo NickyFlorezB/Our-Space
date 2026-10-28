@@ -2,6 +2,7 @@ package com.nicky.ourspace.application.usecases.user;
 
 import org.springframework.stereotype.Service;
 
+import com.nicky.ourspace.domain.model.User;
 import com.nicky.ourspace.domain.port.UserPort;
 
 @Service
@@ -14,7 +15,7 @@ public class SaveUserUseCase {
     }
 
     public void execute(String username, String password, String cellphone, String email) {
-        var user = new com.nicky.ourspace.domain.model.User(
+        var user = new User(
                 java.util.UUID.randomUUID(),
                 username,
                 password,

@@ -1,10 +1,13 @@
 package com.nicky.ourspace.infrastructure.drivenadapters.persistence.dbo;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,6 +25,9 @@ public class UserDbo {
     private String cellphone;
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<RoomDbo> rooms = new HashSet<>();
 
     public UserDbo() {
     }
@@ -54,6 +60,10 @@ public class UserDbo {
         return cellphone;
     }
 
+    public Set<RoomDbo> getRooms() {
+        return rooms;
+    }
+
     public void setId(UUID id) {
         this.id = id;
     }
@@ -72,6 +82,25 @@ public class UserDbo {
 
     public void setCellphone(String cellphone) {
         this.cellphone = cellphone;
+    }
+
+    public void addRoom(RoomDbo room) {
+        rooms.add(room);
+        room.setOwner(this);
+    }
+
+    public void removeRoom(RoomDbo room) {
+        if (rooms.remove(room) && room.getOwner() == this) {
+            room.setOwner(null);
+        }
+    }
+
+    void addRoomReference(RoomDbo room) {
+        rooms.add(room);
+    }
+
+    void removeRoomReference(RoomDbo room) {
+        rooms.remove(room);
     }
 
 }
