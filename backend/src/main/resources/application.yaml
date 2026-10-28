@@ -7,11 +7,16 @@ spring:
     password: espacio123
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
 
   flyway:
     enabled: false
   
+
+security:
+  jwt:
+    secret: eJcB7ZidEPQALsWOlqEQ1OyXoGvOhyTKnhDNVnC9UwE
+
 server:
   servlet:
     context-path: /api/v1

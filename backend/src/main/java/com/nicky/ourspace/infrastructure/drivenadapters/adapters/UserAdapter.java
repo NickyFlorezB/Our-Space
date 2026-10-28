@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.nicky.ourspace.domain.model.User;
@@ -17,14 +18,22 @@ public class UserAdapter implements UserPort {
 
     private final JpaUserRepository jpaUserRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserAdapter(JpaUserRepository jpaUserRepository, UserMapper userMapper) {
+    public UserAdapter(JpaUserRepository jpaUserRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.jpaUserRepository = jpaUserRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public User saveUser(User user) {
+        user = new User(
+                user.id(),
+                user.username(),
+                this.passwordEncoder.encode(user.password()),
+                user.cellphone(),
+                user.email());
         UserDbo userDbo = jpaUserRepository.save(
                 this.userMapper.toDbo(user));
         return this.userMapper.toDomain(userDbo);
@@ -46,14 +55,12 @@ public class UserAdapter implements UserPort {
 
     @Override
     public Optional<User> findUserByUsername(String username) {
-        UserDbo userDbo = jpaUserRepository.findByUsername(username);
-        return Optional.ofNullable(userDbo).map(this.userMapper::toDomain);
+        return jpaUserRepository.findByUsername(username).map(this.userMapper::toDomain);
     }
 
     @Override
     public Optional<User> findUserByEmail(String email) {
-        UserDbo userDbo = jpaUserRepository.findByEmail(email);
-        return Optional.ofNullable(userDbo).map(this.userMapper::toDomain);
+        return jpaUserRepository.findByEmail(email).map(this.userMapper::toDomain);
     }
 
     @Override
@@ -64,7 +71,7 @@ public class UserAdapter implements UserPort {
             userDboToUpdate.setUsername(user.username());
             userDboToUpdate.setEmail(user.email());
             userDboToUpdate.setCellphone(user.cellphone());
-            userDboToUpdate.setPassword(user.password());
+            userDboToUpdate.setPassword(this.passwordEncoder.encode(user.password()));
             UserDbo updatedUserDbo = jpaUserRepository.save(userDboToUpdate);
             return this.userMapper.toDomain(updatedUserDbo);
         } else {

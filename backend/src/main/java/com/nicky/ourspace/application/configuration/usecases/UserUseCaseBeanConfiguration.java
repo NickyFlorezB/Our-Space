@@ -1,4 +1,4 @@
-package com.nicky.ourspace.application.configuration.usecases.user;
+package com.nicky.ourspace.application.configuration.usecases;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
