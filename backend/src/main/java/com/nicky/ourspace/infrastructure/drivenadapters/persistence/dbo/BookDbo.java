@@ -42,11 +42,14 @@ public class BookDbo {
 
     private List<String> publishers;
 
+    @Column(name = "image_url", length = 2048)
+    private String imageUrl;
+
     protected BookDbo() {
     }
 
     public BookDbo(UUID id, RoomDbo room, String isbn_13, String title, String weight, String fullTitle,
-            Integer latestRevision, String createdAt, List<String> publishers) {
+            Integer latestRevision, String createdAt, List<String> publishers, String imageUrl) {
         this.id = id;
         this.room = room;
         this.isbn_13 = isbn_13;
@@ -56,6 +59,7 @@ public class BookDbo {
         this.latestRevision = latestRevision;
         this.createdAt = createdAt;
         this.publishers = publishers;
+        this.imageUrl = imageUrl;
     }
 
     public UUID getId() {
@@ -92,6 +96,10 @@ public class BookDbo {
 
     public List<String> getPublishers() {
         return publishers;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
 }

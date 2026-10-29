@@ -12,4 +12,16 @@ public interface ImageStoragePort {
     InputStream readRoomImage(UUID roomId, UUID imageId);
 
     void deleteRoomImage(UUID roomId, UUID imageId);
+
+    StoredImage saveMovieCover(UUID movieId, ImageUpload image);
+
+    InputStream readMovieCover(UUID movieId);
+
+    void deleteMovieCover(UUID movieId);
+
+    StoredImage saveBookCover(UUID bookId, ImageUpload image);
+
+    InputStream readBookCover(UUID bookId);
+
+    void deleteBookCover(UUID bookId);
 }

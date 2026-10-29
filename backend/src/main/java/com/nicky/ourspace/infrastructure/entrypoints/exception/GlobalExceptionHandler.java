@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.nicky.ourspace.domain.exception.OwnerMembershipCannotBeRemovedException;
+import com.nicky.ourspace.domain.exception.BookNotFoundException;
 import com.nicky.ourspace.domain.exception.ImageNotFoundException;
+import com.nicky.ourspace.domain.exception.MovieNotFoundException;
 import com.nicky.ourspace.domain.exception.RoomMemberAccessDeniedException;
 import com.nicky.ourspace.domain.exception.RoomMemberAlreadyExistsException;
 import com.nicky.ourspace.domain.exception.RoomMemberNotFoundException;
@@ -24,7 +26,9 @@ public class GlobalExceptionHandler {
             RoomNotFoundException.class,
             RoomMemberNotFoundException.class,
             UserNotFoundException.class,
-            ImageNotFoundException.class
+            ImageNotFoundException.class,
+            BookNotFoundException.class,
+            MovieNotFoundException.class
     })
     public ResponseEntity<String> handleRoomMemberNotFoundException(RuntimeException ex) {
         return ResponseEntity.status(404).body(ex.getMessage());
