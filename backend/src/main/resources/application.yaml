@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: ourspace
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ourspace
+    username: espacio
+    password: espacio123
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+  flyway:
+    enabled: false
+  
+
+security:
+  jwt:
+    secret: eJcB7ZidEPQALsWOlqEQ1OyXoGvOhyTKnhDNVnC9UwE
+
+server:
+  servlet:
+    context-path: /api/v1
+
+app:
+  storage:
+    root: ${IMAGE_STORAGE_PATH:${user.home}/.ourspace/images}
+  images:
+    url-prefix: ${server.servlet.context-path:/api/v1}

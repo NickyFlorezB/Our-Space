@@ -1,0 +1,12 @@
+package com.nicky.ourspace.domain.model;
+
+import java.util.UUID;
+
+public record Movie(
+        UUID id,
+        UUID roomId,
+        String name,
+        String comment,
+        String url,
+        String imageUrl) {
+}
