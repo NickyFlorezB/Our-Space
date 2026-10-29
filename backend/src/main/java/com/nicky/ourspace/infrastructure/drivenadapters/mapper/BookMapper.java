@@ -19,7 +19,8 @@ public class BookMapper {
                 dbo.getFullTitle(),
                 dbo.getLatestRevision(),
                 dbo.getCreatedAt(),
-                dbo.getPublishers());
+                dbo.getPublishers(),
+                dbo.getImageUrl());
     }
 
     public BookDbo toDbo(Book book, RoomDbo room) {
@@ -32,6 +33,7 @@ public class BookMapper {
                 book.fullTitle(),
                 book.latestRevision(),
                 book.createdAt(),
-                book.publishers());
+                book.publishers(),
+                book.imageUrl());
     }
 }

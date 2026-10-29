@@ -12,6 +12,7 @@ public record Book(
         String fullTitle,
         Integer latestRevision,
         String createdAt,
-        List<String> publishers) {
+        List<String> publishers,
+        String imageUrl) {
 
 }

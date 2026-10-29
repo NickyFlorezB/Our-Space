@@ -2,7 +2,6 @@ package com.nicky.ourspace.application.usecases.image;
 
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.nicky.ourspace.domain.exception.RoomMemberAccessDeniedException;
@@ -19,17 +18,17 @@ public class UploadRoomImageUseCase {
     private final ImagePort imagePort;
     private final ImageStoragePort imageStoragePort;
     private final RoomMemberPort roomMemberPort;
-    private final String publicPathPrefix;
+    private final ImageUrlFactory imageUrlFactory;
 
     public UploadRoomImageUseCase(
             ImagePort imagePort,
             ImageStoragePort imageStoragePort,
             RoomMemberPort roomMemberPort,
-            @Value("${app.images.url-prefix:/api/v1}") String publicPathPrefix) {
+            ImageUrlFactory imageUrlFactory) {
         this.imagePort = imagePort;
         this.imageStoragePort = imageStoragePort;
         this.roomMemberPort = roomMemberPort;
-        this.publicPathPrefix = normalizePrefix(publicPathPrefix);
+        this.imageUrlFactory = imageUrlFactory;
     }
 
     public Image execute(UUID roomId, UUID userId, ImageUpload upload) {
@@ -37,7 +36,7 @@ public class UploadRoomImageUseCase {
 
         UUID imageId = UUID.randomUUID();
         StoredImage storedImage = imageStoragePort.saveRoomImage(roomId, imageId, upload);
-        String url = publicPathPrefix + "/room/" + roomId + "/images/" + imageId + "/content";
+        String url = imageUrlFactory.roomImage(roomId, imageId);
         Image image = new Image(imageId, roomId, url, storedImage.contentType(), storedImage.size());
 
         try {
@@ -58,13 +57,4 @@ public class UploadRoomImageUseCase {
         }
     }
 
-    private String normalizePrefix(String prefix) {
-        if (prefix == null || prefix.isBlank() || prefix.equals("/")) {
-            return "";
-        }
-        String normalized = prefix.startsWith("/") ? prefix : "/" + prefix;
-        return normalized.endsWith("/")
-                ? normalized.substring(0, normalized.length() - 1)
-                : normalized;
-    }
 }

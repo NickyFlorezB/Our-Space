@@ -53,10 +53,41 @@ public class LocalImageStorageAdapter implements ImageStoragePort {
 
     @Override
     public StoredImage saveRoomImage(UUID roomId, UUID imageId, ImageUpload upload) {
-        validateUpload(upload);
+        return saveImage(roomDirectory(roomId), imagePath(roomId, imageId), upload);
+    }
 
-        Path directory = roomDirectory(roomId);
-        Path destination = imagePath(roomId, imageId);
+    @Override
+    public StoredImage saveMovieCover(UUID movieId, ImageUpload upload) {
+        return saveImage(coverDirectory("movies"), coverPath("movies", movieId), upload);
+    }
+
+    @Override
+    public InputStream readMovieCover(UUID movieId) {
+        return readImage(coverPath("movies", movieId));
+    }
+
+    @Override
+    public void deleteMovieCover(UUID movieId) {
+        deleteImage(coverPath("movies", movieId));
+    }
+
+    @Override
+    public StoredImage saveBookCover(UUID bookId, ImageUpload upload) {
+        return saveImage(coverDirectory("books"), coverPath("books", bookId), upload);
+    }
+
+    @Override
+    public InputStream readBookCover(UUID bookId) {
+        return readImage(coverPath("books", bookId));
+    }
+
+    @Override
+    public void deleteBookCover(UUID bookId) {
+        deleteImage(coverPath("books", bookId));
+    }
+
+    private StoredImage saveImage(Path directory, Path destination, ImageUpload upload) {
+        validateUpload(upload);
         Path temporaryFile = null;
 
         try {
@@ -102,8 +133,12 @@ public class LocalImageStorageAdapter implements ImageStoragePort {
 
     @Override
     public InputStream readRoomImage(UUID roomId, UUID imageId) {
+        return readImage(imagePath(roomId, imageId));
+    }
+
+    private InputStream readImage(Path imagePath) {
         try {
-            return Files.newInputStream(imagePath(roomId, imageId));
+            return Files.newInputStream(imagePath);
         } catch (IOException exception) {
             throw new UncheckedIOException("Could not read image", exception);
         }
@@ -111,8 +146,12 @@ public class LocalImageStorageAdapter implements ImageStoragePort {
 
     @Override
     public void deleteRoomImage(UUID roomId, UUID imageId) {
+        deleteImage(imagePath(roomId, imageId));
+    }
+
+    private void deleteImage(Path imagePath) {
         try {
-            Files.deleteIfExists(imagePath(roomId, imageId));
+            Files.deleteIfExists(imagePath);
         } catch (IOException exception) {
             throw new UncheckedIOException("Could not delete image", exception);
         }
@@ -176,6 +215,22 @@ public class LocalImageStorageAdapter implements ImageStoragePort {
     private Path imagePath(UUID roomId, UUID imageId) {
         Path roomDirectory = roomDirectory(roomId);
         Path imagePath = roomDirectory.resolve(imageId + ".jpg").normalize();
+        if (!imagePath.startsWith(storageRoot)) {
+            throw new IllegalArgumentException("Invalid image path");
+        }
+        return imagePath;
+    }
+
+    private Path coverDirectory(String category) {
+        Path directory = storageRoot.resolve(category).normalize();
+        if (!directory.startsWith(storageRoot)) {
+            throw new IllegalArgumentException("Invalid image path");
+        }
+        return directory;
+    }
+
+    private Path coverPath(String category, UUID coverId) {
+        Path imagePath = coverDirectory(category).resolve(coverId + ".jpg").normalize();
         if (!imagePath.startsWith(storageRoot)) {
             throw new IllegalArgumentException("Invalid image path");
         }
