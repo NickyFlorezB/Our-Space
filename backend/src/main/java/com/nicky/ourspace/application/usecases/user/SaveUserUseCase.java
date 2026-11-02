@@ -1,7 +1,9 @@
 package com.nicky.ourspace.application.usecases.user;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.nicky.ourspace.application.usecases.room.EnsureUserRoomsUseCase;
 import com.nicky.ourspace.domain.model.User;
 import com.nicky.ourspace.domain.port.UserPort;
 
@@ -9,11 +11,14 @@ import com.nicky.ourspace.domain.port.UserPort;
 public class SaveUserUseCase {
 
     private final UserPort userPort;
+    private final EnsureUserRoomsUseCase ensureUserRoomsUseCase;
 
-    public SaveUserUseCase(UserPort userPort) {
+    public SaveUserUseCase(UserPort userPort, EnsureUserRoomsUseCase ensureUserRoomsUseCase) {
         this.userPort = userPort;
+        this.ensureUserRoomsUseCase = ensureUserRoomsUseCase;
     }
 
+    @Transactional
     public void execute(String username, String password, String cellphone, String email) {
         var user = new User(
                 java.util.UUID.randomUUID(),
@@ -21,6 +26,7 @@ public class SaveUserUseCase {
                 password,
                 cellphone,
                 email);
-        userPort.saveUser(user);
+        User savedUser = userPort.saveUser(user);
+        ensureUserRoomsUseCase.ensureRoom(savedUser);
     }
 }

@@ -1,0 +1,43 @@
+<section class="recover-access-page-container">
+  <div class="recover-access-page-container__head">
+    <header class="recover-access-page-container__header">
+      <div class="recover-access-page-container__header__icon-heart">
+        <svg lucideLock></svg>
+      </div>
+      <h1 class="recover-access-page-container__header__title">Recupera tu acceso</h1>
+      <p class="recover-access-page-container__header__subtitle">
+        Responde tu pregunta secreta y crea una contraseña nueva.
+      </p>
+    </header>
+
+    <div class="recover-access-page-container__actions">
+      <form class="recover-access-page-container__actions__form">
+        <div class="recover-access-page-container__actions__form__question">
+          <p class="recover-access-page-container__actions__form__question__title">
+            NUESTRA PREGUNTA
+          </p>
+          <label
+            class="recover-access-page-container__actions__form__question__label"
+            for="question"
+            >¿Cuál fue la primera canción que compartimos?</label
+          >
+          <input id="question" type="text" placeholder="Escribe tu respuesta." />
+          <p class="recover-access-page-container__actions__form__question__hint">
+            No distingue mayúsculas ni tildes.
+          </p>
+        </div>
+
+        <div class="recover-access-page-container__actions__form__buttons">
+          <button class="recover-access-page-container__actions__go-in-btn">Entrar</button>
+          <button
+            type="button"
+            class="recover-access-page-container__actions__go-back-btn"
+            routerLink="/login"
+          >
+            Volver al ingreso
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

@@ -2,6 +2,7 @@ package com.nicky.ourspace.infrastructure.drivenadapters.adapters;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.image.BufferedImage;
@@ -17,6 +18,7 @@ import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import com.nicky.ourspace.domain.exception.ImageNotFoundException;
 import com.nicky.ourspace.domain.model.ImageUpload;
 import com.nicky.ourspace.infrastructure.drivenadapters.storage.ImageStorageProperties;
 
@@ -60,6 +62,37 @@ class LocalImageStorageAdapterTest {
         assertNotNull(storedBook);
         assertTrue(storedMovie.getWidth() <= 1200);
         assertTrue(storedMovie.getHeight() <= 1200);
+    }
+
+    @Test
+    void storesAndReadsRoomImagesFromTheSamePersistentLocation() throws Exception {
+        byte[] sourceImage = createPngImage(800, 600);
+        LocalImageStorageAdapter storage = new LocalImageStorageAdapter(
+                new ImageStorageProperties(storageRoot));
+        UUID roomId = UUID.randomUUID();
+        UUID imageId = UUID.randomUUID();
+
+        var storedImage = storage.saveRoomImage(
+                roomId, imageId, new ImageUpload(new ByteArrayInputStream(sourceImage), sourceImage.length));
+
+        Path storedPath = storageRoot.resolve(roomId.toString()).resolve(imageId + ".jpg");
+        assertTrue(Files.exists(storedPath));
+        assertEquals(Files.size(storedPath), storedImage.size());
+        LocalImageStorageAdapter restartedStorage = new LocalImageStorageAdapter(
+                new ImageStorageProperties(storageRoot));
+        try (InputStream content = restartedStorage.readRoomImage(roomId, imageId)) {
+            assertNotNull(ImageIO.read(content));
+        }
+    }
+
+    @Test
+    void reportsMissingRoomImageContentAsNotFound() {
+        LocalImageStorageAdapter storage = new LocalImageStorageAdapter(
+                new ImageStorageProperties(storageRoot));
+
+        assertThrows(
+                ImageNotFoundException.class,
+                () -> storage.readRoomImage(UUID.randomUUID(), UUID.randomUUID()));
     }
 
     private byte[] createPngImage(int width, int height) throws Exception {

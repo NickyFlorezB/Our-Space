@@ -1,0 +1,52 @@
+<main class="photo-detail">
+  @if (isLoading()) {
+    <p class="photo-detail__status" role="status">Cargando foto...</p>
+  } @else if (imageUrl()) {
+    <section class="photo-viewer" aria-label="Detalle de la foto">
+      <img class="photo-viewer__image" [src]="imageUrl()" [alt]="title() || 'Foto compartida'" />
+
+      <div class="photo-viewer__top-bar">
+        <a class="photo-viewer__icon-button" routerLink="/photos" aria-label="Volver a fotos">
+          <span aria-hidden="true">‹</span>
+        </a>
+        <span class="photo-viewer__counter">{{ imagePosition() }} de {{ imageCount() }}</span>
+        <span
+          class="photo-viewer__icon-button photo-viewer__favorite"
+          aria-hidden="true"
+        >♡</span>
+      </div>
+
+      <article class="photo-story">
+        <div class="photo-story__handle" aria-hidden="true"></div>
+        <header class="photo-story__author">
+          <span class="photo-story__avatar" aria-hidden="true">♥</span>
+          <div>
+            <p class="photo-story__author-name">{{ roomName() }}</p>
+            <p class="photo-story__author-caption">Recuerdo compartido</p>
+          </div>
+        </header>
+
+        <h1 class="photo-story__title">{{ title() || 'Un recuerdo especial' }}</h1>
+        <p class="photo-story__eyebrow">DESCRIPCIÓN</p>
+        <p class="photo-story__description">
+          {{ comment() || 'Este momento ya forma parte de nuestra historia.' }}
+        </p>
+
+        <footer class="photo-story__footer">
+          <div class="photo-story__like">
+            <span aria-hidden="true">♡</span>
+            Me encanta
+          </div>
+          <div class="photo-story__navigation">
+            @if (imagePosition() > 1) {
+              <button type="button" aria-label="Foto anterior" (click)="showPrevious()">‹</button>
+            }
+            @if (imagePosition() < imageCount()) {
+              <button type="button" aria-label="Foto siguiente" (click)="showNext()">›</button>
+            }
+          </div>
+        </footer>
+      </article>
+    </section>
+  }
+</main>

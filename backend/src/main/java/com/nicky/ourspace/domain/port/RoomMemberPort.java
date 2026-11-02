@@ -16,5 +16,7 @@ public interface RoomMemberPort {
 
     List<RoomMember> findRoomMembersByUserId(UUID userId);
 
+    void synchronizeOwnerMemberships();
+
     void deleteRoomMember(UUID roomId, UUID userId);
 }

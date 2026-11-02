@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.nicky.ourspace.domain.exception.OwnerMembershipCannotBeRemovedException;
 import com.nicky.ourspace.domain.exception.BookNotFoundException;
@@ -64,12 +65,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RefreshTokenNotFoundException.class)
     public ResponseEntity<String> handleRefreshTokenNotFoundException(RefreshTokenNotFoundException ex) {
-        return ResponseEntity.status(404).body("Refresh token not found");
+        return ResponseEntity.status(401).body("Refresh token is not valid");
     }
 
     @ExceptionHandler(RefreshTokenRevokedException.class)
     public ResponseEntity<String> handleRefreshTokenRevokedException(RefreshTokenRevokedException ex) {
         return ResponseEntity.status(401).body("Refresh token has been revoked");
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> handleResponseStatusException(ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
     }
 
     @ExceptionHandler(Exception.class)

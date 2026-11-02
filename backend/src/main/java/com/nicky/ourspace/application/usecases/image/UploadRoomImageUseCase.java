@@ -31,13 +31,29 @@ public class UploadRoomImageUseCase {
         this.imageUrlFactory = imageUrlFactory;
     }
 
-    public Image execute(UUID roomId, UUID userId, ImageUpload upload) {
+    public Image execute(UUID roomId, UUID userId, ImageUpload upload, String title, String comment) {
         requireMembership(roomId, userId);
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Image title is required");
+        }
+        if (title.length() > 160) {
+            throw new IllegalArgumentException("Image titles cannot exceed 160 characters");
+        }
+        if (comment != null && comment.length() > 1000) {
+            throw new IllegalArgumentException("Image comments cannot exceed 1000 characters");
+        }
 
         UUID imageId = UUID.randomUUID();
         StoredImage storedImage = imageStoragePort.saveRoomImage(roomId, imageId, upload);
         String url = imageUrlFactory.roomImage(roomId, imageId);
-        Image image = new Image(imageId, roomId, url, storedImage.contentType(), storedImage.size());
+        Image image = new Image(
+                imageId,
+                roomId,
+                url,
+                storedImage.contentType(),
+                storedImage.size(),
+                title.trim(),
+                comment == null || comment.isBlank() ? null : comment.trim());
 
         try {
             return imagePort.save(image);

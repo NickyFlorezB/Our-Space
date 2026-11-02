@@ -1,0 +1,122 @@
+<section class="photos-page">
+  <header class="photos-page__header">
+    <div>
+      <h1 class="photos-page__title">Fotos</h1>
+      <p class="photos-page__subtitle">{{ photos().length }} recuerdos compartidos</p>
+    </div>
+
+    @if (rooms().length > 1) {
+      <label class="photos-page__room-picker">
+        <span>Habitación</span>
+        <select [value]="selectedRoomId()" (change)="onRoomChange($event)">
+          @for (room of rooms(); track room.id) {
+            <option [value]="room.id">{{ room.name }}</option>
+          }
+        </select>
+      </label>
+    }
+  </header>
+
+  @if (isLoading()) {
+    <p class="photos-page__message" role="status">Cargando fotos...</p>
+  } @else if (rooms().length === 0) {
+    <p class="photos-page__message">Todavía no tienes una habitación para compartir fotos.</p>
+  } @else if (photos().length === 0) {
+    <p class="photos-page__message">Aún no hay fotos. ¡Agrega el primer recuerdo!</p>
+  } @else {
+    <div class="photos-page__grid">
+      @for (photo of photos(); track photo.id; let index = $index) {
+        <a
+          class="photo-card"
+          [class.photo-card--tall]="index % 3 === 1"
+          [routerLink]="['/photos', photo.id]"
+          [attr.aria-label]="'Ver foto: ' + (photo.title || 'Un recuerdo especial')"
+        >
+          <img [src]="photo.src" [alt]="photo.title || 'Foto compartida'" />
+          <div class="photo-card__caption">
+            <h2>{{ photo.title || 'Un recuerdo especial' }}</h2>
+            @if (photo.comment) {
+              <p>{{ photo.comment }}</p>
+            }
+          </div>
+        </a>
+      }
+    </div>
+  }
+
+  @if (rooms().length > 0) {
+    <button
+      class="photos-page__add-button"
+      type="button"
+      aria-label="Añadir foto"
+      (click)="openUploadDialog()"
+    >
+      <span aria-hidden="true">+</span>
+    </button>
+  }
+
+  @if (isUploadDialogOpen()) {
+    <div class="photo-dialog-backdrop" (click)="closeUploadDialog()">
+      <section
+        class="photo-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="photo-dialog-title"
+        (click)="$event.stopPropagation()"
+      >
+        <h2 id="photo-dialog-title">Añadir un recuerdo</h2>
+        <form [formGroup]="photoForm" (ngSubmit)="uploadPhoto()">
+          <label class="photo-dialog__field" for="photo-file">
+            <span>Foto</span>
+            <input
+              id="photo-file"
+              type="file"
+              accept="image/jpeg,image/png"
+              (change)="onFileSelected($event)"
+              required
+            />
+          </label>
+          @if (selectedFile()) {
+            <p class="photo-dialog__file-name">{{ selectedFile()?.name }}</p>
+          }
+
+          <label class="photo-dialog__field" for="photo-title">
+            <span>Título</span>
+            <input
+              id="photo-title"
+              type="text"
+              formControlName="title"
+              maxlength="160"
+              placeholder="Ej. Tarde en el mirador"
+              required
+            />
+          </label>
+
+          <label class="photo-dialog__field" for="photo-comment">
+            <span>Descripción</span>
+            <textarea
+              id="photo-comment"
+              formControlName="comment"
+              maxlength="1000"
+              rows="3"
+              placeholder="¿Qué quieres recordar de este momento?"
+            ></textarea>
+          </label>
+
+          <div class="photo-dialog__actions">
+            <button type="button" class="photo-dialog__cancel" (click)="closeUploadDialog()">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="photo-dialog__submit"
+              [disabled]="!selectedFile() || photoForm.invalid || isUploading()"
+            >
+              {{ isUploading() ? 'Subiendo...' : 'Guardar foto' }}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
+</section>

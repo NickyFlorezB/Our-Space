@@ -7,5 +7,7 @@ public record Image(
         UUID roomId,
         String url,
         String contentType,
-        Long size) {
+        Long size,
+        String title,
+        String comment) {
 }

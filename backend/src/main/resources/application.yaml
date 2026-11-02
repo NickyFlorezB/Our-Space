@@ -16,7 +16,6 @@ spring:
 
   flyway:
     enabled: false
-  
 
 security:
   jwt:
@@ -27,7 +26,15 @@ server:
     context-path: /api/v1
 
 app:
+  cors:
+    allowed-origins: ${FRONTEND_ORIGINS:${FRONTEND_ORIGIN:http://localhost:4200,http://127.0.0.1:4200}}
+  auth:
+    refresh-cookie:
+      name: refreshToken
+      # Set REFRESH_COOKIE_SECURE=true in production. Use SameSite=None only across sites.
+      secure: ${REFRESH_COOKIE_SECURE:false}
+      same-site: ${REFRESH_COOKIE_SAME_SITE:Lax}
   storage:
-    root: ${IMAGE_STORAGE_PATH:${user.home}/.ourspace/images}
+    root: ${IMAGE_STORAGE_PATH:/home/nicky/.ourspace/images}
   images:
     url-prefix: ${server.servlet.context-path:/api/v1}

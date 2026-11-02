@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -21,6 +22,7 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.springframework.stereotype.Service;
 
+import com.nicky.ourspace.domain.exception.ImageNotFoundException;
 import com.nicky.ourspace.domain.model.ImageUpload;
 import com.nicky.ourspace.domain.model.StoredImage;
 import com.nicky.ourspace.domain.port.ImageStoragePort;
@@ -139,8 +141,14 @@ public class LocalImageStorageAdapter implements ImageStoragePort {
     private InputStream readImage(Path imagePath) {
         try {
             return Files.newInputStream(imagePath);
+        } catch (NoSuchFileException exception) {
+            throw new ImageNotFoundException(
+                    "Stored image content is unavailable at " + imagePath
+                            + ". Expected layout: /home/nicky/.ourspace/images/{roomId}/{imageId}.jpg");
         } catch (IOException exception) {
-            throw new UncheckedIOException("Could not read image", exception);
+            throw new UncheckedIOException(
+                    "Could not read image. Verify IMAGE_STORAGE_PATH and that the stored file is present.",
+                    exception);
         }
     }
 

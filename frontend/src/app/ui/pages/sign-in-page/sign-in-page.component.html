@@ -1,0 +1,38 @@
+<section class="sign-in-page-container">
+  <div class="sign-in-page-container__head">
+    <header class="sign-in-page-container__header">
+      <div class="sign-in-page-container__header__icon-heart">
+        <svg lucideHeart></svg>
+      </div>
+      <h1 class="sign-in-page-container__header__title">Iniciar sesión</h1>
+      <p class="sign-in-page-container__header__subtitle">Entra con tu usuario y contraseña</p>
+    </header>
+
+    <div class="sign-in-page-container__actions">
+      <form
+        (submit)="onSubmit()"
+        class="sign-in-page-container__actions__form"
+        [formGroup]="profileForm"
+      >
+        <div class="sign-in-page-container__actions__form__username">
+          <label for="username">Username</label>
+          <input id="username" type="text" formControlName="username" />
+        </div>
+
+        <div class="sign-in-page-container__actions__form__password">
+          <label for="password">Contraseña</label>
+          <input id="password" type="password" formControlName="password" />
+        </div>
+        <button type="submit" class="sign-in-page-container__actions__go-in-btn">Entrar</button>
+      </form>
+      <button
+        [disabled]="loading || profileForm.invalid"
+        type="button"
+        class="sign-in-page-container__actions__go-back-btn"
+        routerLink="/recover"
+      >
+        ¿Olvidaste tu contraseña?
+      </button>
+    </div>
+  </div>
+</section>

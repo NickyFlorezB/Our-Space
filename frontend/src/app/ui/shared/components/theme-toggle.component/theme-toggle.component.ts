@@ -1,5 +1,5 @@
+import { ThemeService } from './../../../../shared/services/theme.service';
 import { Component, inject } from '@angular/core';
-import { ThemeService } from '../../../shared/services/theme.service';
 
 @Component({
   selector: 'app-theme-toggle',

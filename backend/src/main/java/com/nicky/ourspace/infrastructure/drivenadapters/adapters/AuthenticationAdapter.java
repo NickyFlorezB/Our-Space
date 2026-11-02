@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.nicky.ourspace.domain.port.AuthenticationPort;
 import com.nicky.ourspace.infrastructure.drivenadapters.persistence.dbo.UserDbo;
@@ -32,10 +34,11 @@ public class AuthenticationAdapter implements AuthenticationPort {
     @Override
     public Map<String, String> login(String username, String password) {
         UserDbo userDbo = jpaUserRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "Invalid username or password"));
 
         if (!passwordEncoder.matches(password, userDbo.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
         }
 
         return new HashMap<>() {

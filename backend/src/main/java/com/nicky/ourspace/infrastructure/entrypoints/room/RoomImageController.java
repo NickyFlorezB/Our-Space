@@ -52,6 +52,8 @@ public class RoomImageController {
     public ResponseEntity<Image> upload(
             @PathVariable("roomId") UUID roomId,
             @RequestParam("file") MultipartFile file,
+            @RequestParam("title") String title,
+            @RequestParam(value = "comment", required = false) String comment,
             Authentication authentication) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("An image file is required");
@@ -61,7 +63,9 @@ public class RoomImageController {
             Image image = uploadRoomImageUseCase.execute(
                     roomId,
                     authenticatedUserId(authentication),
-                    new ImageUpload(content, file.getSize()));
+                    new ImageUpload(content, file.getSize()),
+                    title,
+                    comment);
             return ResponseEntity.status(HttpStatus.CREATED).body(image);
         }
     }
