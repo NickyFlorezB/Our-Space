@@ -90,6 +90,12 @@ public class RoomMemberAdapter implements RoomMemberPort {
 
     @Override
     @Transactional
+    public void synchronizeOwnerMemberships() {
+        jpaRoomMemberRepository.synchronizeOwnerMemberships();
+    }
+
+    @Override
+    @Transactional
     public void deleteRoomMember(UUID roomId, UUID userId) {
         jpaRoomMemberRepository.deleteById(new RoomMemberId(roomId, userId));
     }

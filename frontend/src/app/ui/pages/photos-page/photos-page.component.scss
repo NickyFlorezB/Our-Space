@@ -1,0 +1,236 @@
+.photos-page {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px 20px calc(120px + env(safe-area-inset-bottom));
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    margin: 0;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 48px;
+  }
+
+  &__subtitle {
+    margin: 4px 0 0;
+    color: var(--color-text-muted);
+  }
+
+  &__room-picker,
+  .photo-dialog__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__room-picker {
+    color: var(--color-text-muted);
+    font-size: 13px;
+
+    select {
+      max-width: 150px;
+      padding: 8px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      background: var(--color-surface);
+      color: var(--color-text);
+    }
+  }
+
+  &__message {
+    margin: 48px 0;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 40px;
+    grid-auto-flow: dense;
+    gap: 16px;
+  }
+
+  &__add-button {
+    position: fixed;
+    z-index: 20;
+    right: 20px;
+    bottom: calc(104px + env(safe-area-inset-bottom));
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-background);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 20%);
+    cursor: pointer;
+
+    span {
+      font-size: 34px;
+      font-weight: 300;
+      line-height: 1;
+    }
+  }
+}
+
+.photo-card {
+  position: relative;
+  grid-row-end: span 5;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--color-surface-2);
+
+  &--tall {
+    grid-row-end: span 7;
+  }
+
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__caption {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 36px 16px 16px;
+    background: linear-gradient(transparent, rgb(0 0 0 / 72%));
+    color: #fff;
+
+    h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+
+    p {
+      display: -webkit-box;
+      margin: 6px 0 0;
+      overflow: hidden;
+      font-size: 12px;
+      line-height: 1.4;
+      opacity: 0.88;
+      overflow-wrap: anywhere;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+  }
+}
+
+.photo-dialog-backdrop {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(0 0 0 / 48%);
+}
+
+.photo-dialog {
+  width: min(100%, 440px);
+  box-sizing: border-box;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 16px 48px rgb(0 0 0 / 20%);
+
+  h2 {
+    margin: 0 0 20px;
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  &__field {
+    margin-top: 16px;
+    font-weight: 600;
+
+    input,
+    textarea {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      background: var(--color-background);
+      color: var(--color-text);
+      font: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+  }
+
+  &__file-name {
+    margin: 8px 0 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  &__cancel,
+  &__submit {
+    padding: 12px 16px;
+    border: 0;
+    border-radius: 24px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  &__cancel {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+  }
+
+  &__submit {
+    background: var(--color-primary);
+    color: var(--color-background);
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  .photos-page {
+    padding-right: 14px;
+    padding-left: 14px;
+
+    &__header {
+      align-items: flex-start;
+    }
+
+    &__title {
+      font-size: 40px;
+    }
+
+    &__room-picker select {
+      max-width: 120px;
+    }
+  }
+}

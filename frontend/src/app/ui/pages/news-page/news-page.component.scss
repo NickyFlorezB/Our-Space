@@ -1,0 +1,149 @@
+.news-page-container {
+  padding: 20px 20px;
+
+  &__header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+
+    &__name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 32px;
+    }
+
+    &__icons {
+      display: flex;
+      align-items: center;
+
+      &__user,
+      &__user-2 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: 'Playfair Display', Georgia, serif;
+        color: var(--color-background);
+        background-color: var(--color-primary);
+      }
+
+      &__user-2 {
+        margin-left: -10px;
+        background-color: var(--color-heart);
+      }
+    }
+  }
+
+  &__cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+
+    &__icon {
+      width: 38px;
+      height: 38px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background-color: var(--color-border);
+      border-radius: 24px;
+      color: var(--color-primary);
+
+      svg {
+        width: 20px;
+        height: 20px;
+
+        stroke-width: 2;
+      }
+    }
+
+    &__card {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: 1px solid var(--color-border);
+
+      &__count {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 38px;
+        line-height: 1;
+        margin: 0;
+      }
+    }
+  }
+
+  &__news {
+    width: 100%;
+    margin-top: 20px;
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+
+      &__title {
+        font-size: 20px;
+      }
+
+      &__check-btn {
+        background-color: var(--color-background);
+        color: var(--color-primary);
+        border: none;
+        border-radius: 40px;
+        padding: 16px 20px;
+        font-weight: bold;
+        font-size: 14px;
+        cursor: pointer;
+      }
+    }
+
+    &__list {
+      width: 100%;
+      border-radius: 20px;
+      border: 1px solid var(--color-border);
+
+      &__item {
+        padding: 0 20px;
+        display: flex;
+        margin: 0;
+        line-height: 0;
+        align-items: center;
+        border-bottom: 1px solid var(--color-border);
+
+        &__avatar {
+          background-color: var(--color-primary);
+          padding: 15px;
+          border-radius: 100%;
+          color: var(--color-background);
+          font-size: 18px;
+          font-weight: bold;
+          font-family: 'Playfair Display', Georgia, serif;
+          line-height: 1;
+        }
+
+        &__texts {
+          margin-left: 10px;
+          line-height: 0.2;
+
+          &__author {
+            font-weight: bold;
+          }
+
+          &__comment,
+          &__name {
+            font-weight: lighter;
+            font-size: 14px;
+            color: gray;
+          }
+        }
+      }
+    }
+  }
+}

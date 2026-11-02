@@ -13,8 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nicky.ourspace.application.usecases.room.SaveRoomUseCase;
+import com.nicky.ourspace.application.usecases.room.EnsureUserRoomsUseCase;
 import com.nicky.ourspace.application.usecases.roommember.AddRoomMemberUseCase;
 import com.nicky.ourspace.application.usecases.roommember.RemoveRoomMemberUseCase;
+import com.nicky.ourspace.application.usecases.user.SaveUserUseCase;
 import com.nicky.ourspace.domain.exception.OwnerMembershipCannotBeRemovedException;
 import com.nicky.ourspace.domain.exception.RoomMemberAlreadyExistsException;
 import com.nicky.ourspace.domain.model.RoomMemberRole;
@@ -23,11 +25,13 @@ import com.nicky.ourspace.infrastructure.drivenadapters.persistence.dbo.UserDbo;
 import com.nicky.ourspace.infrastructure.drivenadapters.persistence.repository.JpaRoomMemberRepository;
 import com.nicky.ourspace.infrastructure.drivenadapters.persistence.repository.JpaUserRepository;
 
-@SpringBootTest
+@SpringBootTest(properties = "security.jwt.secret=test-only-signing-key-with-at-least-32-bytes")
 @Transactional
 class OurspaceApplicationTests {
 
 	private final SaveRoomUseCase saveRoomUseCase;
+	private final EnsureUserRoomsUseCase ensureUserRoomsUseCase;
+	private final SaveUserUseCase saveUserUseCase;
 	private final AddRoomMemberUseCase addRoomMemberUseCase;
 	private final RemoveRoomMemberUseCase removeRoomMemberUseCase;
 	private final JpaUserRepository jpaUserRepository;
@@ -36,11 +40,15 @@ class OurspaceApplicationTests {
 	@Autowired
 	OurspaceApplicationTests(
 			SaveRoomUseCase saveRoomUseCase,
+			EnsureUserRoomsUseCase ensureUserRoomsUseCase,
+			SaveUserUseCase saveUserUseCase,
 			AddRoomMemberUseCase addRoomMemberUseCase,
 			RemoveRoomMemberUseCase removeRoomMemberUseCase,
 			JpaUserRepository jpaUserRepository,
 			JpaRoomMemberRepository jpaRoomMemberRepository) {
 		this.saveRoomUseCase = saveRoomUseCase;
+		this.ensureUserRoomsUseCase = ensureUserRoomsUseCase;
+		this.saveUserUseCase = saveUserUseCase;
 		this.addRoomMemberUseCase = addRoomMemberUseCase;
 		this.removeRoomMemberUseCase = removeRoomMemberUseCase;
 		this.jpaUserRepository = jpaUserRepository;
@@ -90,6 +98,33 @@ class OurspaceApplicationTests {
 		removeRoomMemberUseCase.execute(savedRoom.id(), memberId, memberId);
 		assertTrue(jpaRoomMemberRepository.findById(ownerMembershipId).isPresent());
 		assertFalse(jpaRoomMemberRepository.findById(memberMembershipId).isPresent());
+	}
+
+	@Test
+	void newUsersAreCreatedWithAnOwnedRoom() {
+		String username = "new-" + UUID.randomUUID();
+		saveUserUseCase.execute(username, "password", "555-0100", username + "@example.com");
+
+		var savedUser = jpaUserRepository.findByUsername(username).orElseThrow();
+		var memberships = jpaRoomMemberRepository.findAllByUser_Id(savedUser.getId());
+
+		assertEquals(1, memberships.size());
+		assertEquals(RoomMemberRole.OWNER, memberships.get(0).getRole());
+		assertEquals(savedUser.getId(), memberships.get(0).getRoom().getOwner().getId());
+	}
+
+	@Test
+	void existingUsersWithoutRoomsReceiveOneAndBackfillIsIdempotent() {
+		UUID userId = UUID.randomUUID();
+		jpaUserRepository.save(user(userId));
+
+		ensureUserRoomsUseCase.ensureRoomsForAllUsers();
+		ensureUserRoomsUseCase.ensureRoomsForAllUsers();
+
+		var memberships = jpaRoomMemberRepository.findAllByUser_Id(userId);
+		assertEquals(1, memberships.size());
+		assertEquals(RoomMemberRole.OWNER, memberships.get(0).getRole());
+		assertEquals(userId, memberships.get(0).getRoom().getOwner().getId());
 	}
 
 	private UserDbo user(UUID id) {

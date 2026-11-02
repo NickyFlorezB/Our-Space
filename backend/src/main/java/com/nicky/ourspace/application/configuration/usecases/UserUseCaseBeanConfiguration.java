@@ -10,6 +10,7 @@ import com.nicky.ourspace.application.usecases.user.FindUserByIdUseCase;
 import com.nicky.ourspace.application.usecases.user.FindUserByUsernameUseCase;
 import com.nicky.ourspace.application.usecases.user.SaveUserUseCase;
 import com.nicky.ourspace.application.usecases.user.UpdateUserUseCase;
+import com.nicky.ourspace.application.usecases.room.EnsureUserRoomsUseCase;
 import com.nicky.ourspace.infrastructure.drivenadapters.adapters.UserAdapter;
 
 @Configuration
@@ -47,8 +48,9 @@ public class UserUseCaseBeanConfiguration {
 
     @Bean
     SaveUserUseCase saveUserUseCase(
-            UserAdapter userPort) {
-        return new SaveUserUseCase(userPort);
+            UserAdapter userPort,
+            EnsureUserRoomsUseCase ensureUserRoomsUseCase) {
+        return new SaveUserUseCase(userPort, ensureUserRoomsUseCase);
     }
 
     @Bean

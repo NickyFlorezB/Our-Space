@@ -15,7 +15,9 @@ public class ImageMapper {
                 dbo.getRoom().getId(),
                 dbo.getUrl(),
                 dbo.getContentType(),
-                dbo.getSize());
+                dbo.getSize(),
+                dbo.getTitle(),
+                dbo.getComment());
     }
 
     public ImageDbo toDbo(Image image, RoomDbo room) {
@@ -24,6 +26,8 @@ public class ImageMapper {
                 room,
                 image.url(),
                 image.contentType(),
-                image.size());
+                image.size(),
+                image.title(),
+                image.comment());
     }
 }

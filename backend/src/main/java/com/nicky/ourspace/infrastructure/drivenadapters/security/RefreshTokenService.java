@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.nicky.ourspace.application.dto.LoginResponseDto;
+import com.nicky.ourspace.application.dto.AuthenticationTokensDto;
 import com.nicky.ourspace.infrastructure.drivenadapters.persistence.dbo.RefreshTokenDbo;
 import com.nicky.ourspace.infrastructure.drivenadapters.persistence.repository.JpaRefreshTokenRepository;
 import com.nicky.ourspace.infrastructure.drivenadapters.security.exception.RefreshTokenExpiredException;
@@ -35,7 +35,7 @@ public class RefreshTokenService {
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Transactional
-    public LoginResponseDto refresh(String rawToken) {
+    public AuthenticationTokensDto refresh(String rawToken) {
 
         String hash = hashToken(rawToken);
 
@@ -69,7 +69,7 @@ public class RefreshTokenService {
 
         String accessToken = this.jwtService.generateAccessToken(userId);
 
-        return new LoginResponseDto(accessToken, newRefreshToken);
+        return new AuthenticationTokensDto(accessToken, newRefreshToken);
     }
 
     @Transactional
@@ -89,6 +89,15 @@ public class RefreshTokenService {
         repository.save(entity);
 
         return refreshToken;
+    }
+
+    @Transactional
+    public void revoke(String rawToken) {
+        repository.findByTokenHash(hashToken(rawToken)).ifPresent(token -> {
+            if (token.getRevokedAt() == null) {
+                token.setRevokedAt(Instant.now());
+            }
+        });
     }
 
     private String generateRefreshToken() {

@@ -30,15 +30,30 @@ public class ImageDbo {
     @Column(nullable = false)
     private long size;
 
+    @Column(length = 160)
+    private String title;
+
+    @Column(name = "comment_text", length = 1000)
+    private String comment;
+
     protected ImageDbo() {
     }
 
-    public ImageDbo(UUID id, RoomDbo room, String url, String contentType, long size) {
+    public ImageDbo(
+            UUID id,
+            RoomDbo room,
+            String url,
+            String contentType,
+            long size,
+            String title,
+            String comment) {
         this.id = id;
         this.room = room;
         this.url = url;
         this.contentType = contentType;
         this.size = size;
+        this.title = title;
+        this.comment = comment;
     }
 
     public UUID getId() {
@@ -59,5 +74,13 @@ public class ImageDbo {
 
     public long getSize() {
         return size;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getComment() {
+        return comment;
     }
 }

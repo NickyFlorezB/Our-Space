@@ -1,0 +1,20 @@
+@use "sass:map";
+@use "variables" as colors;
+
+@mixin generate-theme($palette) {
+    @each $name, $value in $palette {
+        --color-#{$name}: #{$value};
+    }
+}
+
+:root {
+    @include generate-theme(colors.$light-colors);
+
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    @include generate-theme(colors.$dark-colors);
+
+    color-scheme: dark;
+}

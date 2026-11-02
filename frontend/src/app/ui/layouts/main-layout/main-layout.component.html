@@ -1,0 +1,29 @@
+<main class="main-layout">
+  <router-outlet />
+</main>
+
+<nav class="bottom-tabs" aria-label="Navegación principal">
+  <a
+    class="bottom-tabs__tab"
+    routerLink="/news"
+    routerLinkActive="bottom-tabs__tab--active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    ariaCurrentWhenActive="page"
+    aria-label="Novedades"
+  >
+    <svg lucideNewspaper aria-hidden="true"></svg>
+    <span>Novedades</span>
+  </a>
+
+  <a
+    class="bottom-tabs__tab"
+    routerLink="/photos"
+    routerLinkActive="bottom-tabs__tab--active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    ariaCurrentWhenActive="page"
+    aria-label="Fotos"
+  >
+    <svg lucideImage aria-hidden="true"></svg>
+    <span>Fotos</span>
+  </a>
+</nav>
