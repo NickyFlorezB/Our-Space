@@ -25,7 +25,7 @@ import com.nicky.ourspace.infrastructure.drivenadapters.persistence.dbo.UserDbo;
 import com.nicky.ourspace.infrastructure.drivenadapters.persistence.repository.JpaRoomMemberRepository;
 import com.nicky.ourspace.infrastructure.drivenadapters.persistence.repository.JpaUserRepository;
 
-@SpringBootTest
+@SpringBootTest(properties = "security.jwt.secret=test-only-signing-key-with-at-least-32-bytes")
 @Transactional
 class OurspaceApplicationTests {
 

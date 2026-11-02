@@ -1,0 +1,36 @@
+{
+	auto_https off
+	admin off
+}
+
+:80 {
+	encode gzip
+
+	request_body {
+		max_size 45MB
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	@blocked path /actuator/* /api/v1/actuator/*
+	handle @blocked {
+		respond "Not found" 404
+	}
+
+	@noCache path /index.html /ngsw-worker.js /ngsw.json /manifest.webmanifest
+	header @noCache Cache-Control "no-cache"
+
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

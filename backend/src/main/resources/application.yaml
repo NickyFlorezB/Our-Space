@@ -4,22 +4,28 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/ourspace
     username: espacio
-    password: espacio123
+    password: ${SPRING_DATASOURCE_PASSWORD:}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 
   servlet:
     multipart:
       max-file-size: 5MB
-      max-request-size: 6MB
+      max-request-size: 45MB
 
   flyway:
-    enabled: false
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
 
 security:
   jwt:
-    secret: eJcB7ZidEPQALsWOlqEQ1OyXoGvOhyTKnhDNVnC9UwE
+    secret: ${JWT_SECRET}
 
 server:
   servlet:

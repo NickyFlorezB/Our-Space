@@ -43,6 +43,7 @@ public class SecurityConfig {
 
                                 .authorizeHttpRequests(auth -> auth
                                                 .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
+                                                .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                                                 .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout").permitAll()
                                                 .requestMatchers("/auth/me").authenticated()
                                                 .requestMatchers(HttpMethod.POST, "/users").permitAll()
