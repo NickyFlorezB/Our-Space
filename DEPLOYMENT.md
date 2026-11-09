@@ -16,6 +16,13 @@ database volume. Set `JWT_SECRET` to a new random value of at least 32 bytes. Ke
 `.env` out of source control. The storage host path and UID/GID must be writable by
 the API container user.
 
+Push notifications are optional. To enable them, generate a VAPID key pair with
+`npx web-push generate-vapid-keys`, then set the resulting public and private keys
+as `APP_PUSH_PUBLIC_KEY` and `APP_PUSH_PRIVATE_KEY` in `.env`. Set
+`APP_PUSH_SUBJECT` to a `mailto:` contact or an HTTPS URL. Keep the private key
+secret. Leave all three values blank to leave push disabled. Rebuild/restart the
+API after changing these values.
+
 For the existing database, retain `DB_VOLUME_NAME=our-space_pgdata` and the current
 image storage directory. The old database has an empty `V1__init.sql` recorded in
 Flyway history. Repair that old checksum once, then start the application:

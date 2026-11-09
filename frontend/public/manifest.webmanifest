@@ -1,0 +1,16 @@
+{
+  "name": "Our Space",
+  "short_name": "Our Space",
+  "description": "Un espacio compartido para recuerdos, libros, películas y música.",
+  "start_url": "/news",
+  "display": "standalone",
+  "background_color": "#fbf8f5",
+  "theme_color": "#715291",
+  "icons": [
+    {
+      "src": "/our-space.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

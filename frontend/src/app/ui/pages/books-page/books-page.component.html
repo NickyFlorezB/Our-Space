@@ -1,0 +1,223 @@
+<section class="library-page library-page--books">
+  <header class="library-hero">
+    <div class="library-hero__copy">
+      <span class="library-eyebrow">Colección compartida</span>
+      <h1>Libros</h1>
+      <p>Historias que queremos leer y recordar juntos.</p>
+    </div>
+    <label class="library-room-picker">
+      <span>Tu espacio</span>
+      <select
+        [value]="selectedRoomId()"
+        (change)="onRoomChange($event)"
+        [disabled]="rooms().length < 2"
+      >
+        @for (room of rooms(); track room.id) {
+          <option [value]="room.id">{{ room.name }}</option>
+        }
+      </select>
+    </label>
+  </header>
+
+  @if (rooms().length > 0) {
+    <section class="library-toolbar" aria-label="Herramientas de la colección">
+      <label class="library-search">
+        <svg lucideSearch aria-hidden="true"></svg>
+        <input
+          type="search"
+          placeholder="Buscar por título, editorial o ISBN"
+          (input)="onSearch($event)"
+        />
+      </label>
+      <span class="library-count"
+        >{{ books().length }} {{ books().length === 1 ? 'libro' : 'libros' }}</span
+      >
+    </section>
+  }
+
+  @if (isLoading()) {
+    <div class="library-state" role="status">
+      <span class="library-state__spinner"></span>
+      <p>Preparando tu biblioteca...</p>
+    </div>
+  } @else if (rooms().length === 0) {
+    <div class="library-state">
+      <span class="library-state__icon"><svg lucideBookOpen aria-hidden="true"></svg></span>
+      <h2>Tu biblioteca comienza aquí</h2>
+      <p>Cuando formes parte de un espacio, podrás guardar libros para compartir.</p>
+    </div>
+  } @else if (books().length === 0) {
+    <div class="library-state">
+      <span class="library-state__icon"><svg lucideBookOpen aria-hidden="true"></svg></span>
+      <h2>Aún no hay libros</h2>
+      <p>Agrega una lectura que quieras compartir con las personas de tu espacio.</p>
+      <button class="library-primary-button" type="button" (click)="openDialog()">
+        <svg lucidePlus aria-hidden="true"></svg> Agregar primer libro
+      </button>
+    </div>
+  } @else if (visibleBooks().length === 0) {
+    <div class="library-state library-state--compact">
+      <h2>No encontramos resultados</h2>
+      <p>Prueba con otro título, autor o ISBN.</p>
+    </div>
+  } @else {
+    <div class="book-grid">
+      @for (book of visibleBooks(); track book.id) {
+        <article class="book-card">
+          <div class="book-card__cover">
+            @if (book.coverSrc) {
+              <img [src]="book.coverSrc" [alt]="'Portada de ' + book.title" />
+            } @else {
+              <div class="book-card__placeholder">
+                <svg lucideBookOpen aria-hidden="true"></svg>
+                <span>{{ book.title }}</span>
+              </div>
+            }
+          </div>
+          <div class="book-card__body">
+            <p class="book-card__publisher">
+              {{ book.publishers?.join(' · ') || 'En nuestra colección' }}
+            </p>
+            <h2>{{ book.title }}</h2>
+            @if (book.fullTitle && book.fullTitle !== book.title) {
+              <p class="book-card__subtitle">{{ book.fullTitle }}</p>
+            }
+            <p class="book-card__meta">ISBN {{ book.isbn_13 }}</p>
+            <a
+              class="book-card__link"
+              [href]="'https://books.google.com/books?vid=ISBN' + book.isbn_13"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Ver detalles <svg lucideExternalLink aria-hidden="true"></svg>
+            </a>
+            <div class="library-card__actions">
+              @if (pendingDeleteId() === book.id) {
+                <span>¿Quitar este libro?</span>
+                <button
+                  class="library-text-button library-text-button--danger"
+                  type="button"
+                  (click)="confirmDelete(book)"
+                >
+                  Quitar
+                </button>
+                <button class="library-text-button" type="button" (click)="cancelDelete()">
+                  Cancelar
+                </button>
+              } @else {
+                <button
+                  class="library-icon-button"
+                  type="button"
+                  aria-label="Quitar libro"
+                  (click)="confirmDelete(book)"
+                >
+                  <svg lucideTrash2 aria-hidden="true"></svg>
+                </button>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  @if (rooms().length > 0) {
+    <button class="library-fab" type="button" aria-label="Agregar libro" (click)="openDialog()">
+      <svg lucidePlus aria-hidden="true"></svg>
+    </button>
+  }
+
+  @if (isDialogOpen()) {
+    <div class="library-dialog-backdrop" (click)="closeDialog()">
+      <section
+        class="library-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="book-dialog-title"
+        (click)="$event.stopPropagation()"
+      >
+        <header class="library-dialog__header">
+          <div>
+            <span class="library-eyebrow">Nueva lectura</span>
+            <h2 id="book-dialog-title">Agregar un libro</h2>
+          </div>
+          <button
+            class="library-icon-button"
+            type="button"
+            aria-label="Cerrar"
+            (click)="closeDialog()"
+          >
+            <svg lucideX aria-hidden="true"></svg>
+          </button>
+        </header>
+        <form [formGroup]="bookForm" (ngSubmit)="saveBook()">
+          <label class="library-field">
+            <span>Título <b>*</b></span>
+            <input
+              formControlName="title"
+              maxlength="255"
+              placeholder="El nombre del libro"
+              required
+            />
+          </label>
+          <div class="library-form-row">
+            <label class="library-field">
+              <span>ISBN-13 <b>*</b></span>
+              <input
+                formControlName="isbn"
+                inputmode="numeric"
+                maxlength="13"
+                placeholder="9780000000000"
+                required
+              />
+              @if (bookForm.controls.isbn.touched && bookForm.controls.isbn.invalid) {
+                <small>Escribe los 13 dígitos del ISBN.</small>
+              }
+            </label>
+            <label class="library-field">
+              <span>Peso</span>
+              <input formControlName="weight" inputmode="decimal" placeholder="0" />
+            </label>
+          </div>
+          <label class="library-field">
+            <span>Editorial</span>
+            <input formControlName="publishers" placeholder="Separa varios nombres con coma" />
+          </label>
+          <label class="library-field">
+            <span>Subtítulo</span>
+            <input formControlName="fullTitle" placeholder="Un detalle adicional del título" />
+          </label>
+          <div class="library-form-row">
+            <label class="library-field">
+              <span>Edición</span>
+              <input formControlName="revision" type="number" min="1" placeholder="1" />
+            </label>
+            <label class="library-field">
+              <span>Fecha de publicación</span>
+              <input formControlName="published" type="date" />
+            </label>
+          </div>
+          <label class="library-field">
+            <span>Portada <small>opcional · JPEG o PNG, hasta 5 MB</small></span>
+            <input type="file" accept="image/jpeg,image/png" (change)="onCoverSelected($event)" />
+          </label>
+          @if (selectedCover()) {
+            <p class="library-file-name">{{ selectedCover()?.name }}</p>
+          }
+          <footer class="library-dialog__actions">
+            <button class="library-secondary-button" type="button" (click)="closeDialog()">
+              Cancelar
+            </button>
+            <button
+              class="library-primary-button"
+              type="submit"
+              [disabled]="bookForm.invalid || isSaving()"
+            >
+              {{ isSaving() ? 'Guardando...' : 'Guardar libro' }}
+            </button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+</section>

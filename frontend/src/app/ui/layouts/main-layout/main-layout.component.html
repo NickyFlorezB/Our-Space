@@ -26,4 +26,40 @@
     <svg lucideImage aria-hidden="true"></svg>
     <span>Fotos</span>
   </a>
+
+  <a
+    class="bottom-tabs__tab"
+    routerLink="/books"
+    routerLinkActive="bottom-tabs__tab--active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    ariaCurrentWhenActive="page"
+    aria-label="Libros"
+  >
+    <svg lucideBookOpen aria-hidden="true"></svg>
+    <span>Libros</span>
+  </a>
+
+  <a
+    class="bottom-tabs__tab"
+    routerLink="/movies"
+    routerLinkActive="bottom-tabs__tab--active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    ariaCurrentWhenActive="page"
+    aria-label="Películas"
+  >
+    <svg lucideClapperboard aria-hidden="true"></svg>
+    <span>Películas</span>
+  </a>
+
+  <a
+    class="bottom-tabs__tab"
+    routerLink="/songs"
+    routerLinkActive="bottom-tabs__tab--active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    ariaCurrentWhenActive="page"
+    aria-label="Canciones"
+  >
+    <svg lucideMusic2 aria-hidden="true"></svg>
+    <span>Canciones</span>
+  </a>
 </nav>

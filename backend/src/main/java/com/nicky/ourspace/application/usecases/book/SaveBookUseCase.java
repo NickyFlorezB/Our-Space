@@ -3,8 +3,10 @@ package com.nicky.ourspace.application.usecases.book;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.nicky.ourspace.application.events.RoomActivityCreatedEvent;
 import com.nicky.ourspace.application.usecases.image.ImageUrlFactory;
 import com.nicky.ourspace.domain.exception.RoomMemberAccessDeniedException;
 import com.nicky.ourspace.domain.model.Book;
@@ -20,16 +22,19 @@ public class SaveBookUseCase {
     private final ImageStoragePort imageStoragePort;
     private final RoomMemberPort roomMemberPort;
     private final ImageUrlFactory imageUrlFactory;
+    private final ApplicationEventPublisher eventPublisher;
 
     public SaveBookUseCase(
             BookPort bookPort,
             ImageStoragePort imageStoragePort,
             RoomMemberPort roomMemberPort,
-            ImageUrlFactory imageUrlFactory) {
+            ImageUrlFactory imageUrlFactory,
+            ApplicationEventPublisher eventPublisher) {
         this.bookPort = bookPort;
         this.imageStoragePort = imageStoragePort;
         this.roomMemberPort = roomMemberPort;
         this.imageUrlFactory = imageUrlFactory;
+        this.eventPublisher = eventPublisher;
     }
 
     public Book execute(UUID roomId, UUID userId, String isbn_13,
@@ -51,8 +56,11 @@ public class SaveBookUseCase {
         }
 
         try {
-            return bookPort.save(new Book(bookId, roomId, isbn_13, title, weight, fullTitle, latestRevision,
-                    createdAt, publishers, imageUrl));
+            Book savedBook = bookPort.save(new Book(bookId, roomId, isbn_13, title, weight, fullTitle,
+                    latestRevision, createdAt, publishers, imageUrl));
+            eventPublisher.publishEvent(new RoomActivityCreatedEvent(
+                    roomId, userId, "Nuevo libro", savedBook.title(), "/books?roomId=" + roomId));
+            return savedBook;
         } catch (RuntimeException exception) {
             if (coverStored) {
                 try {

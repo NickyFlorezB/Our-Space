@@ -11,6 +11,7 @@ import com.nicky.ourspace.domain.exception.OwnerMembershipCannotBeRemovedExcepti
 import com.nicky.ourspace.domain.exception.BookNotFoundException;
 import com.nicky.ourspace.domain.exception.ImageNotFoundException;
 import com.nicky.ourspace.domain.exception.MovieNotFoundException;
+import com.nicky.ourspace.domain.exception.PushNotificationsUnavailableException;
 import com.nicky.ourspace.domain.exception.RoomMemberAccessDeniedException;
 import com.nicky.ourspace.domain.exception.RoomMemberAlreadyExistsException;
 import com.nicky.ourspace.domain.exception.RoomMemberNotFoundException;
@@ -46,6 +47,12 @@ public class GlobalExceptionHandler {
     })
     public ResponseEntity<String> handleRoomMemberConflictException(RuntimeException ex) {
         return ResponseEntity.status(409).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PushNotificationsUnavailableException.class)
+    public ResponseEntity<String> handlePushNotificationsUnavailableException(
+            PushNotificationsUnavailableException ex) {
+        return ResponseEntity.status(503).body(ex.getMessage());
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})

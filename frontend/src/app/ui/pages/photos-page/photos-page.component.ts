@@ -2,7 +2,7 @@ import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, forkJoin, map, of, Subscription, switchMap, throwError } from 'rxjs';
 import { Image, Photo } from '../../../core/images/models/image.model';
 import { ImageService } from '../../../core/images/services/image.service';
@@ -19,6 +19,7 @@ import { RoomService } from '../../../core/rooms/services/room.service';
 export class PhotosPageComponent implements OnInit {
   private readonly imageService = inject(ImageService);
   private readonly roomService = inject(RoomService);
+  private readonly route = inject(ActivatedRoute);
   private readonly toastService = inject(ToastService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
@@ -48,10 +49,11 @@ export class PhotosPageComponent implements OnInit {
       .subscribe({
         next: (rooms) => {
           this.rooms.set(rooms);
-          const firstRoom = rooms[0];
-          if (firstRoom) {
-            this.selectedRoomId.set(firstRoom.id);
-            this.loadPhotos(firstRoom.id);
+          const requestedRoomId = this.route.snapshot.queryParamMap.get('roomId');
+          const selectedRoom = rooms.find((room) => room.id === requestedRoomId) ?? rooms[0];
+          if (selectedRoom) {
+            this.selectedRoomId.set(selectedRoom.id);
+            this.loadPhotos(selectedRoom.id);
             return;
           }
 

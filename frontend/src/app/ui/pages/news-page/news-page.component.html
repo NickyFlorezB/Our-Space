@@ -1,107 +1,140 @@
-<section class="news-page-container">
-  <!-- TODO: NAVBAR WITH ROOM SELECTOR AND PROFILE -->
-
-  <header class="news-page-container__header">
-    <p>
-      Buenas noches,
-      <span class="news-page-container__header__name"
-        ><br />
-        Persona</span
-      >
-    </p>
-    <div class="news-page-container__header__icons">
-      <p class="news-page-container__header__icons__user">N</p>
-      <p class="news-page-container__header__icons__user-2">E</p>
+<section class="dashboard">
+  <header class="dashboard__header">
+    <div>
+      <p class="dashboard__eyebrow">OUR SPACE · ESPACIO COMPARTIDO</p>
+      <h1>{{ greeting }}, <span>bienvenidos a casa.</span></h1>
+      <p class="dashboard__intro">Un vistazo a todo lo que comparten.</p>
     </div>
+
+    @if (rooms().length > 1) {
+      <label class="dashboard__room-picker">
+        <span>Habitación</span>
+        <select [value]="selectedRoomId()" (change)="onRoomChange($event)">
+          @for (room of rooms(); track room.id) {
+            <option [value]="room.id">{{ room.name }}</option>
+          }
+        </select>
+      </label>
+    }
   </header>
 
-  <div class="news-page-container__cards">
-    <div class="news-page-container__cards__card">
-      <div class="news-page-container__cards__icon">
-        <svg lucideImage></svg>
-      </div>
-      <h4 class="news-page-container__cards__card__count">24</h4>
-      <p class="news-page-container__cards__card__subtitle">Fotos</p>
-    </div>
-
-    <div class="news-page-container__cards__card">
-      <div class="news-page-container__cards__icon">
-        <svg lucideEighthNotes></svg>
-      </div>
-      <h4 class="news-page-container__cards__card__count">18</h4>
-      <p class="news-page-container__cards__card__subtitle">Canciones</p>
-    </div>
-
-    <div class="news-page-container__cards__card">
-      <div class="news-page-container__cards__icon">
-        <svg lucideBookOpen></svg>
-      </div>
-      <h4 class="news-page-container__cards__card__count">7</h4>
-      <p class="news-page-container__cards__card__subtitle">Libros</p>
-    </div>
-
-    <div class="news-page-container__cards__card">
-      <div class="news-page-container__cards__icon">
-        <svg lucideClapperboard></svg>
-      </div>
-      <h4 class="news-page-container__cards__card__count">5</h4>
-      <p class="news-page-container__cards__card__subtitle">Películas</p>
-    </div>
-  </div>
-
-  <div class="news-page-container__news">
-    <div class="news-page-container__news__header">
-      <h2 class="news-page-container__news__header__title">Novedades</h2>
-      <button class="news-page-container__news__header__check-btn">Marcar vistas</button>
-    </div>
-
-    <div class="news-page-container__news__list">
-      <div class="news-page-container__news__list__item">
-        <h2 class="news-page-container__news__list__item__avatar">N</h2>
-        <div class="news-page-container__news__list__item__texts">
-          <p class="news-page-container__news__list__item__texts__author">
-            Nicky
-            <span class="news-page-container__news__list__item__texts__comment"
-              >Agregó una canción</span
-            >
-          </p>
-          <p class="news-page-container__news__list__item__texts__name">
-            Golder Hour - <span>hace 2 horas</span>
-          </p>
+  @if (isLoadingRooms()) {
+    <p class="dashboard__state" role="status">Cargando tus habitaciones…</p>
+  } @else if (rooms().length === 0) {
+    <section class="dashboard__empty">
+      <h2>Tu espacio empieza aquí</h2>
+      <p>Aún no formas parte de una habitación compartida.</p>
+    </section>
+  } @else {
+    <section class="dashboard__overview" aria-labelledby="overview-title">
+      <div class="dashboard__section-heading">
+        <div>
+          <p class="dashboard__eyebrow">RESUMEN DE LA HABITACIÓN</p>
+          <h2 id="overview-title">{{ selectedRoomName() }}</h2>
         </div>
+        @if (statsError()) {
+          <button class="dashboard__push-button" type="button" (click)="reloadStats()">Reintentar</button>
+        }
       </div>
 
-      <div class="news-page-container__news__list__item">
-        <h2 class="news-page-container__news__list__item__avatar">N</h2>
-        <div class="news-page-container__news__list__item__texts">
-          <p class="news-page-container__news__list__item__texts__author">
-            Nicky
-            <span class="news-page-container__news__list__item__texts__comment"
-              >Agregó una canción</span
-            >
-          </p>
-          <p class="news-page-container__news__list__item__texts__name">
-            Golder Hour - <span>hace 2 horas</span>
-          </p>
+      @if (isLoadingStats()) {
+        <p class="dashboard__state" role="status">Actualizando estadísticas…</p>
+      } @else if (stats(); as totals) {
+        <div class="dashboard__stats">
+          <a
+            class="dashboard__stat dashboard__stat--photos"
+            routerLink="/photos"
+            [queryParams]="{ roomId: selectedRoomId() }"
+          >
+            <span class="dashboard__stat-icon"><svg lucideImage aria-hidden="true"></svg></span>
+            <strong>{{ totals.photos }}</strong>
+            <span>Fotos</span>
+          </a>
+          <a
+            class="dashboard__stat dashboard__stat--books"
+            routerLink="/books"
+            [queryParams]="{ roomId: selectedRoomId() }"
+          >
+            <span class="dashboard__stat-icon"><svg lucideBookOpen aria-hidden="true"></svg></span>
+            <strong>{{ totals.books }}</strong>
+            <span>Libros</span>
+          </a>
+          <a
+            class="dashboard__stat dashboard__stat--movies"
+            routerLink="/movies"
+            [queryParams]="{ roomId: selectedRoomId() }"
+          >
+            <span class="dashboard__stat-icon"><svg lucideClapperboard aria-hidden="true"></svg></span>
+            <strong>{{ totals.movies }}</strong>
+            <span>Películas</span>
+          </a>
+          <a
+            class="dashboard__stat dashboard__stat--songs"
+            routerLink="/songs"
+            [queryParams]="{ roomId: selectedRoomId() }"
+          >
+            <span class="dashboard__stat-icon"><svg lucideEighthNotes aria-hidden="true"></svg></span>
+            <strong>{{ totals.songs }}</strong>
+            <span>Canciones</span>
+          </a>
+          <article class="dashboard__stat dashboard__stat--members">
+            <span class="dashboard__stat-icon" aria-hidden="true">♡</span>
+            <strong>{{ totals.members }}</strong>
+            <span>Personas</span>
+          </article>
         </div>
-      </div>
+      } @else if (statsError()) {
+        <p class="dashboard__state">No se pudieron cargar las estadísticas de esta habitación.</p>
+      }
+    </section>
 
-      <div class="news-page-container__news__list__item">
-        <h2 class="news-page-container__news__list__item__avatar">N</h2>
-        <div class="news-page-container__news__list__item__texts">
-          <p class="news-page-container__news__list__item__texts__author">
-            Nicky
-            <span class="news-page-container__news__list__item__texts__comment"
-              >Agregó una canción</span
-            >
-          </p>
-          <p class="news-page-container__news__list__item__texts__name">
-            Golder Hour - <span>hace 2 horas</span>
-          </p>
+    <section class="dashboard__lower">
+      <article class="dashboard__activity">
+        <p class="dashboard__eyebrow">UN ESPACIO PARA COMPARTIR</p>
+        <h2>Pequeños momentos, grandes recuerdos.</h2>
+        <p>
+          Guarda una foto, recomienda un libro o comparte la música y las películas que disfrutan
+          juntos.
+        </p>
+        <div class="dashboard__quick-links">
+          <a routerLink="/photos" [queryParams]="{ roomId: selectedRoomId() }">
+            Ver fotos <span aria-hidden="true">↗</span>
+          </a>
+          <a routerLink="/books" [queryParams]="{ roomId: selectedRoomId() }">
+            Explorar libros <span aria-hidden="true">↗</span>
+          </a>
         </div>
-      </div>
-    </div>
-  </div>
+      </article>
 
-  <!-- TODO: NAVIGATION BOTTON BAR -->
+      <aside class="dashboard__push">
+        <div>
+          <p class="dashboard__eyebrow">SIEMPRE AL TANTO</p>
+          <h2>Notificaciones</h2>
+          @if (!isPushSupported()) {
+            <p>Este navegador no admite notificaciones push.</p>
+          } @else if (!isPushConfigured()) {
+            <p>Las notificaciones aún no están configuradas en el servidor.</p>
+          } @else {
+            <p>Recibe un aviso cuando alguien añada algo a la habitación.</p>
+          }
+        </div>
+        <button
+          type="button"
+          class="dashboard__push-button"
+          [disabled]="
+            !isPushSupported() || (!isPushConfigured() && !notificationsEnabled()) || isPushLoading()
+          "
+          (click)="toggleNotifications()"
+        >
+          @if (isPushLoading()) {
+            Actualizando…
+          } @else if (notificationsEnabled()) {
+            Desactivar
+          } @else {
+            Activar notificaciones
+          }
+        </button>
+      </aside>
+    </section>
+  }
 </section>
