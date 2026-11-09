@@ -19,6 +19,24 @@ export const routes: Routes = [
         title: 'Photos Page',
       },
       {
+        path: 'books',
+        loadComponent: () => import('./ui/pages/books-page/books-page.component'),
+        canActivate: [authGuard],
+        title: 'Libros',
+      },
+      {
+        path: 'movies',
+        loadComponent: () => import('./ui/pages/movies-page/movies-page.component'),
+        canActivate: [authGuard],
+        title: 'Películas',
+      },
+      {
+        path: 'songs',
+        loadComponent: () => import('./ui/pages/songs-page/songs-page.component'),
+        canActivate: [authGuard],
+        title: 'Canciones',
+      },
+      {
         path: 'photos/:imageId',
         loadComponent: () => import('./ui/pages/photo-detail-page/photo-detail-page.component'),
         canActivate: [authGuard],

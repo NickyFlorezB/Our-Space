@@ -2,8 +2,10 @@ package com.nicky.ourspace.application.usecases.image;
 
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.nicky.ourspace.application.events.RoomActivityCreatedEvent;
 import com.nicky.ourspace.domain.exception.RoomMemberAccessDeniedException;
 import com.nicky.ourspace.domain.model.Image;
 import com.nicky.ourspace.domain.model.ImageUpload;
@@ -19,16 +21,19 @@ public class UploadRoomImageUseCase {
     private final ImageStoragePort imageStoragePort;
     private final RoomMemberPort roomMemberPort;
     private final ImageUrlFactory imageUrlFactory;
+    private final ApplicationEventPublisher eventPublisher;
 
     public UploadRoomImageUseCase(
             ImagePort imagePort,
             ImageStoragePort imageStoragePort,
             RoomMemberPort roomMemberPort,
-            ImageUrlFactory imageUrlFactory) {
+            ImageUrlFactory imageUrlFactory,
+            ApplicationEventPublisher eventPublisher) {
         this.imagePort = imagePort;
         this.imageStoragePort = imageStoragePort;
         this.roomMemberPort = roomMemberPort;
         this.imageUrlFactory = imageUrlFactory;
+        this.eventPublisher = eventPublisher;
     }
 
     public Image execute(UUID roomId, UUID userId, ImageUpload upload, String title, String comment) {
@@ -56,7 +61,10 @@ public class UploadRoomImageUseCase {
                 comment == null || comment.isBlank() ? null : comment.trim());
 
         try {
-            return imagePort.save(image);
+            Image savedImage = imagePort.save(image);
+            eventPublisher.publishEvent(new RoomActivityCreatedEvent(
+                    roomId, userId, "Nueva foto", savedImage.title(), "/photos?roomId=" + roomId));
+            return savedImage;
         } catch (RuntimeException exception) {
             try {
                 imageStoragePort.deleteRoomImage(roomId, imageId);

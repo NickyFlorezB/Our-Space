@@ -2,8 +2,10 @@ package com.nicky.ourspace.application.usecases.movie;
 
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.nicky.ourspace.application.events.RoomActivityCreatedEvent;
 import com.nicky.ourspace.application.usecases.image.ImageUrlFactory;
 import com.nicky.ourspace.domain.exception.RoomMemberAccessDeniedException;
 import com.nicky.ourspace.domain.model.ImageUpload;
@@ -19,16 +21,19 @@ public class SaveMovieUseCase {
     private final ImageStoragePort imageStoragePort;
     private final RoomMemberPort roomMemberPort;
     private final ImageUrlFactory imageUrlFactory;
+    private final ApplicationEventPublisher eventPublisher;
 
     public SaveMovieUseCase(
             MoviePort moviePort,
             ImageStoragePort imageStoragePort,
             RoomMemberPort roomMemberPort,
-            ImageUrlFactory imageUrlFactory) {
+            ImageUrlFactory imageUrlFactory,
+            ApplicationEventPublisher eventPublisher) {
         this.moviePort = moviePort;
         this.imageStoragePort = imageStoragePort;
         this.roomMemberPort = roomMemberPort;
         this.imageUrlFactory = imageUrlFactory;
+        this.eventPublisher = eventPublisher;
     }
 
     public Movie execute(UUID roomId, UUID userId, String name, String comment, String url, ImageUpload coverUpload) {
@@ -46,7 +51,10 @@ public class SaveMovieUseCase {
         }
 
         try {
-            return moviePort.save(new Movie(movieId, roomId, name, comment, url, imageUrl));
+            Movie savedMovie = moviePort.save(new Movie(movieId, roomId, name, comment, url, imageUrl));
+            eventPublisher.publishEvent(new RoomActivityCreatedEvent(
+                    roomId, userId, "Nueva película", savedMovie.name(), "/movies?roomId=" + roomId));
+            return savedMovie;
         } catch (RuntimeException exception) {
             if (coverStored) {
                 try {

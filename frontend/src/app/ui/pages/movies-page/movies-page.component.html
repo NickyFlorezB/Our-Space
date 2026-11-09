@@ -1,0 +1,191 @@
+<section class="library-page library-page--movies">
+  <header class="library-hero">
+    <div class="library-hero__copy">
+      <span class="library-eyebrow">Noche de película</span>
+      <h1>Películas</h1>
+      <p>Un rincón para guardar historias que queremos ver juntos.</p>
+    </div>
+    <label class="library-room-picker">
+      <span>Tu espacio</span>
+      <select
+        [value]="selectedRoomId()"
+        (change)="onRoomChange($event)"
+        [disabled]="rooms().length < 2"
+      >
+        @for (room of rooms(); track room.id) {
+          <option [value]="room.id">{{ room.name }}</option>
+        }
+      </select>
+    </label>
+  </header>
+
+  @if (rooms().length > 0) {
+    <section class="library-toolbar" aria-label="Herramientas de la colección">
+      <label class="library-search">
+        <svg lucideSearch aria-hidden="true"></svg>
+        <input type="search" placeholder="Buscar película o nota" (input)="onSearch($event)" />
+      </label>
+      <span class="library-count"
+        >{{ movies().length }} {{ movies().length === 1 ? 'película' : 'películas' }}</span
+      >
+    </section>
+  }
+
+  @if (isLoading()) {
+    <div class="library-state" role="status">
+      <span class="library-state__spinner"></span>
+      <p>Preparando tu cartelera...</p>
+    </div>
+  } @else if (rooms().length === 0) {
+    <div class="library-state">
+      <span class="library-state__icon"><svg lucideClapperboard aria-hidden="true"></svg></span>
+      <h2>Tu próxima historia empieza aquí</h2>
+      <p>Cuando formes parte de un espacio, podrás compartir películas y enlaces.</p>
+    </div>
+  } @else if (movies().length === 0) {
+    <div class="library-state">
+      <span class="library-state__icon"><svg lucideClapperboard aria-hidden="true"></svg></span>
+      <h2>La cartelera está vacía</h2>
+      <p>Guarda esa película que llevan tiempo queriendo ver.</p>
+      <button class="library-primary-button" type="button" (click)="openDialog()">
+        <svg lucidePlus aria-hidden="true"></svg> Agregar primera película
+      </button>
+    </div>
+  } @else if (visibleMovies().length === 0) {
+    <div class="library-state library-state--compact">
+      <h2>No encontramos resultados</h2>
+      <p>Prueba con otro nombre o nota.</p>
+    </div>
+  } @else {
+    <div class="movie-grid">
+      @for (movie of visibleMovies(); track movie.id) {
+        <article class="movie-card">
+          <div class="movie-card__poster">
+            @if (movie.coverSrc) {
+              <img [src]="movie.coverSrc" [alt]="'Portada de ' + movie.name" />
+            } @else {
+              <div class="movie-card__placeholder">
+                <svg lucideClapperboard aria-hidden="true"></svg>
+                <span>Una historia para ver juntos</span>
+              </div>
+            }
+            <span class="movie-card__play"><svg lucidePlay aria-hidden="true"></svg></span>
+          </div>
+          <div class="movie-card__body">
+            <p class="movie-card__eyebrow">Para nuestra próxima función</p>
+            <h2>{{ movie.name }}</h2>
+            <p class="movie-card__note">{{ movie.comment }}</p>
+            <div class="movie-card__footer">
+              @if (safeLink(movie.url); as link) {
+                <a class="movie-card__link" [href]="link" target="_blank" rel="noopener noreferrer">
+                  Abrir enlace <svg lucideExternalLink aria-hidden="true"></svg>
+                </a>
+              }
+              <div class="library-card__actions">
+                @if (pendingDeleteId() === movie.id) {
+                  <span>¿Quitar?</span>
+                  <button
+                    class="library-text-button library-text-button--danger"
+                    type="button"
+                    (click)="confirmDelete(movie)"
+                  >
+                    Sí
+                  </button>
+                  <button class="library-text-button" type="button" (click)="cancelDelete()">
+                    No
+                  </button>
+                } @else {
+                  <button
+                    class="library-icon-button"
+                    type="button"
+                    aria-label="Quitar película"
+                    (click)="confirmDelete(movie)"
+                  >
+                    <svg lucideTrash2 aria-hidden="true"></svg>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  @if (rooms().length > 0) {
+    <button class="library-fab" type="button" aria-label="Agregar película" (click)="openDialog()">
+      <svg lucidePlus aria-hidden="true"></svg>
+    </button>
+  }
+
+  @if (isDialogOpen()) {
+    <div class="library-dialog-backdrop" (click)="closeDialog()">
+      <section
+        class="library-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="movie-dialog-title"
+        (click)="$event.stopPropagation()"
+      >
+        <header class="library-dialog__header">
+          <div>
+            <span class="library-eyebrow">Para la lista compartida</span>
+            <h2 id="movie-dialog-title">Agregar película</h2>
+          </div>
+          <button
+            class="library-icon-button"
+            type="button"
+            aria-label="Cerrar"
+            (click)="closeDialog()"
+          >
+            <svg lucideX aria-hidden="true"></svg>
+          </button>
+        </header>
+        <form [formGroup]="movieForm" (ngSubmit)="saveMovie()">
+          <label class="library-field"
+            ><span>Nombre <b>*</b></span
+            ><input formControlName="name" maxlength="255" placeholder="¿Qué película?" required
+          /></label>
+          <label class="library-field"
+            ><span>Por qué verla <b>*</b></span
+            ><textarea
+              formControlName="comment"
+              maxlength="255"
+              rows="3"
+              placeholder="Una nota para quienes la verán contigo"
+              required
+            ></textarea>
+          </label>
+          <label class="library-field"
+            ><span>Enlace <b>*</b></span
+            ><input
+              formControlName="url"
+              type="url"
+              maxlength="255"
+              placeholder="https://..."
+              required
+          /></label>
+          <label class="library-field"
+            ><span>Imagen de portada <small>opcional · JPEG o PNG, hasta 5 MB</small></span
+            ><input type="file" accept="image/jpeg,image/png" (change)="onCoverSelected($event)"
+          /></label>
+          @if (selectedCover()) {
+            <p class="library-file-name">{{ selectedCover()?.name }}</p>
+          }
+          <footer class="library-dialog__actions">
+            <button class="library-secondary-button" type="button" (click)="closeDialog()">
+              Cancelar
+            </button>
+            <button
+              class="library-primary-button"
+              type="submit"
+              [disabled]="movieForm.invalid || isSaving()"
+            >
+              {{ isSaving() ? 'Guardando...' : 'Guardar película' }}
+            </button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+</section>

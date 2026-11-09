@@ -41,6 +41,10 @@ app:
       # Set REFRESH_COOKIE_SECURE=true in production. Use SameSite=None only across sites.
       secure: ${REFRESH_COOKIE_SECURE:false}
       same-site: ${REFRESH_COOKIE_SAME_SITE:Lax}
+  push:
+    public-key: ${APP_PUSH_PUBLIC_KEY:}
+    private-key: ${APP_PUSH_PRIVATE_KEY:}
+    subject: ${APP_PUSH_SUBJECT:}
   storage:
     root: ${IMAGE_STORAGE_PATH:/home/nicky/.ourspace/images}
   images:

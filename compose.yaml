@@ -36,6 +36,9 @@ services:
       SECURITY_JWT_SECRET: ${JWT_SECRET:-}
       FRONTEND_ORIGINS: ${FRONTEND_ORIGINS:-http://localhost:4200,http://127.0.0.1:4200}
       REFRESH_COOKIE_SECURE: "true"
+      APP_PUSH_PUBLIC_KEY: ${APP_PUSH_PUBLIC_KEY:-}
+      APP_PUSH_PRIVATE_KEY: ${APP_PUSH_PRIVATE_KEY:-}
+      APP_PUSH_SUBJECT: ${APP_PUSH_SUBJECT:-}
       IMAGE_STORAGE_PATH: /data/uploads
       JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=75.0
     volumes:
